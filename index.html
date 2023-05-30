@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>rsqre: r^2 explained</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" type="text/javascript"></script>
+    <script src="https://unpkg.com/simple-statistics@7.8.3/dist/simple-statistics.min.js" type="text/javascript"></script>
+    <style>
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+    </style>
+</head>
+<body>
+    <center><h1>rsqre: r^2 explained</h1></center>
+    <center><h2>Scatterplot and histogram of y-values in scatterplot</h2></center>
+    <div style="display: grid; grid-template-columns: 1fr 1fr;">
+        <div>
+            <canvas id="scatterplot"></canvas>
+        </div>
+        <div>
+            <canvas id="histogramY"></canvas>
+        </div>
+    </div>
+    <center><h2>Residual plot and histogram of residuals</h2></center>
+    <div style="display: grid; grid-template-columns: 1fr 1fr;">
+        <div>
+            <canvas id="residualPlot"></canvas>
+        </div>
+        <div>
+            <canvas id="histogramRes"></canvas>
+        </div>
+    </div>
+</body>
+</html>
