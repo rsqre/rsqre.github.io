@@ -31,4 +31,57 @@
         </div>
     </div>
 </body>
+<script>
+    const sctx = document.getElementById('scatterplot');
+    const schart = new Chart(sctx, {
+        type: 'scatter',
+        data: {
+        	datasets: [{
+        		label: 'Scatter Dataset',
+          	    data: [],
+                backgroundColor: '#2596be90',
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    min: 0,
+                    max: 10
+                },
+                y: {
+                	type: 'linear',
+                    position: 'left',
+                    min: 0,
+                    max: 10
+                }
+            },
+            onClick: (event) => {
+                const rawPosition = Chart.helpers.getRelativePosition(event, schart);
+             	const dataX = schart.scales["x"].getValueForPixel(rawPosition.x);
+      			const dataY = schart.scales.y.getValueForPixel(rawPosition.y);
+                hychart.data.datasets[0].data[Math.floor(dataY)]++;
+                hychart.update('none');
+                schart.data.datasets[0].data.push({x: dataX, y: dataY});
+                schart.update('none');
+                
+                var dataNewFormat = [];
+                for(var point of schart.data.datasets[0].data) {
+					dataNewFormat.push([point.x, point.y]);
+                }
+                hrchart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                rpchart.data.datasets[0].data = [];
+                var line = ss.linearRegression(dataNewFormat);
+                for(var point of schart.data.datasets[0].data) {
+                    var residual = point.y - (line.b + line.m * point.x);
+                    hrchart.data.datasets[0].data[Math.floor(residual + 5)]++;
+                    rpchart.data.datasets[0].data.push({x: point.x, y: residual});
+                }
+                hrchart.update('none');
+                rpchart.update('none');
+            }
+        }
+    });
+</script>
 </html>
