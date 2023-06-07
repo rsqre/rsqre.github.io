@@ -11,6 +11,17 @@
         html {
             border-top: seagreen solid 0.5em;
         }
+        button {
+            font-family: inherit;
+            background-color: lightcyan;
+            padding: 0.3em;
+            border-radius: 0.5em;
+            cursor: pointer;
+            border: 0.15em black solid;
+        }
+        button:hover {
+            background-color: white;
+        }
     </style>
 </head>
 <body>
@@ -22,6 +33,7 @@
             <button id="noAssociation">No Association</button>
             <button id="weakAssociation">Weak Association</button>
             <button id="moderateAssociation">Moderate Association</button>
+            <button id="strongAssociation">Strong Association</button>
         </div>
     </center>
     <div style="display: grid; grid-template-columns: 1fr 1fr;">
@@ -115,6 +127,22 @@
             }]
         }
     });
+    function updateResiduals() {
+        var dataNewFormat = [];
+        for(var point of schart.data.datasets[0].data) {
+			dataNewFormat.push([point.x, point.y]);
+        }
+        hrchart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        rpchart.data.datasets[0].data = [];
+        var line = ss.linearRegression(dataNewFormat);
+        for(var point of schart.data.datasets[0].data) {
+            var residual = point.y - (line.b + line.m * point.x);
+            hrchart.data.datasets[0].data[Math.floor(residual + 5)]++;
+            rpchart.data.datasets[0].data.push({x: point.x, y: residual});
+        }
+        hrchart.update('none');
+        rpchart.update('none');
+    }
     const sctx = document.getElementById('scatterplot');
     const schart = new Chart(sctx, {
         type: 'scatter',
@@ -148,25 +176,11 @@
                 hychart.update('none');
                 schart.data.datasets[0].data.push({x: dataX, y: dataY});
                 schart.update('none');
-                
-                var dataNewFormat = [];
-                for(var point of schart.data.datasets[0].data) {
-					dataNewFormat.push([point.x, point.y]);
-                }
-                hrchart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                rpchart.data.datasets[0].data = [];
-                var line = ss.linearRegression(dataNewFormat);
-                for(var point of schart.data.datasets[0].data) {
-                    var residual = point.y - (line.b + line.m * point.x);
-                    hrchart.data.datasets[0].data[Math.floor(residual + 5)]++;
-                    rpchart.data.datasets[0].data.push({x: point.x, y: residual});
-                }
-                hrchart.update('none');
-                rpchart.update('none');
+                updateResiduals();
             }
         }
     });
-    document.getElementById("noAssociation").addEventListener('click', () => {
+    document.getElementById("noAssociation").addEventListener('click', (event) => {
         hychart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         schart.data.datasets[0].data = [];
         for(var ix = 0; ix < 200; ix++) {
@@ -177,21 +191,7 @@
         }
         schart.update('none');
         hychart.update('none');
-
-        var dataNewFormat = [];
-        for(var point of schart.data.datasets[0].data) {
-			dataNewFormat.push([point.x, point.y]);
-        }
-        hrchart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        rpchart.data.datasets[0].data = [];
-        var line = ss.linearRegression(dataNewFormat);
-        for(var point of schart.data.datasets[0].data) {
-            var residual = point.y - (line.b + line.m * point.x);
-            hrchart.data.datasets[0].data[Math.floor(residual + 5)]++;
-            rpchart.data.datasets[0].data.push({x: point.x, y: residual});
-        }
-        hrchart.update('none');
-        rpchart.update('none');
+        updateResiduals();
     });
     document.getElementById("weakAssociation").addEventListener('click', () => {
         hychart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -206,21 +206,7 @@
         }
         schart.update('none');
         hychart.update('none');
-
-        var dataNewFormat = [];
-        for(var point of schart.data.datasets[0].data) {
-			dataNewFormat.push([point.x, point.y]);
-        }
-        hrchart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        rpchart.data.datasets[0].data = [];
-        var line = ss.linearRegression(dataNewFormat);
-        for(var point of schart.data.datasets[0].data) {
-            var residual = point.y - (line.b + line.m * point.x);
-            hrchart.data.datasets[0].data[Math.floor(residual + 5)]++;
-            rpchart.data.datasets[0].data.push({x: point.x, y: residual});
-        }
-        hrchart.update('none');
-        rpchart.update('none');
+        updateResiduals();
     });
     document.getElementById("moderateAssociation").addEventListener('click', () => {
         hychart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -235,21 +221,7 @@
         }
         schart.update('none');
         hychart.update('none');
-
-        var dataNewFormat = [];
-        for(var point of schart.data.datasets[0].data) {
-			dataNewFormat.push([point.x, point.y]);
-        }
-        hrchart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        rpchart.data.datasets[0].data = [];
-        var line = ss.linearRegression(dataNewFormat);
-        for(var point of schart.data.datasets[0].data) {
-            var residual = point.y - (line.b + line.m * point.x);
-            hrchart.data.datasets[0].data[Math.floor(residual + 5)]++;
-            rpchart.data.datasets[0].data.push({x: point.x, y: residual});
-        }
-        hrchart.update('none');
-        rpchart.update('none');
+        updateResiduals();
     });
 </script>
 </html>
