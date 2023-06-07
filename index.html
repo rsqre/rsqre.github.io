@@ -223,5 +223,20 @@
         hychart.update('none');
         updateResiduals();
     });
+    document.getElementById("strongAssociation").addEventListener('click', () => {
+        hychart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        schart.data.datasets[0].data = [];
+        for(var ix = 0; ix < 10; ix++) {
+            for(var j = 0; j < 10; j++) {
+                var x = ix + Math.random();
+                var y = Math.min(ix + 2.5 * Math.random(), 10 - 2.5 * Math.random());
+                schart.data.datasets[0].data.push({x: x, y: y});
+                hychart.data.datasets[0].data[Math.floor(y)]++;
+            }
+        }
+        schart.update('none');
+        hychart.update('none');
+        updateResiduals();
+    });
 </script>
 </html>
