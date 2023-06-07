@@ -37,6 +37,11 @@
             <button id="strongAssociation">Strong Association</button>
 			<button id="clearGraph">Clear Graph</button>
         </div>
+		<div>
+			<span style="color: blue;"><b>Standard deviation (SD) of y-values:</b> <span id="sdy"></span></span>,
+			<span style="color: green;"><b>SD of residuals</b> <span id="sdr"></span></span>,
+			<span style="color: red;"><b>r^2:</b> <span id="r2"></span></span>
+		</div>
     </center>
     <div style="display: grid; grid-template-columns: 1fr 1fr;">
         <div>
@@ -69,7 +74,7 @@
                 backgroundColor: '#2596be90',
             	barPercentage: 1.0,
                 categoryPercentage: 1.0,
-                borderColor: "#003602",
+                borderColor: "#002236",
                 borderWidth: 1,
             }]
         },
@@ -99,7 +104,7 @@
                 backgroundColor: '#4ec74590',
                 barPercentage: 1.0,
                 categoryPercentage: 1.0,
-                borderColor: "#003602",
+                borderColor: "#002236",
                 borderWidth: 1,
             }]
         },
@@ -150,7 +155,7 @@
         type: 'scatter',
         data: {
         	datasets: [{
-        		label: 'Scatter Dataset',
+        		label: 'Scatterplot (click to add points)',
           	    data: [],
                 backgroundColor: '#2596be90',
             }]
@@ -179,9 +184,28 @@
                 schart.data.datasets[0].data.push({x: dataX, y: dataY});
                 schart.update('none');
                 updateResiduals();
+				updateInfo();
             }
         }
     });
+	function updateInfo() {
+		var yValues = [];
+		for(var point of schart.data.datasets[0].data) {
+			yValues.push(point.y);
+		}
+		document.getElementById("sdy").innerText = ss.standardDeviation(yValues).toFixed(4);
+		yValues = [];
+		for(var point of rpchart.data.datasets[0].data) {
+			yValues.push(point.y);
+		}
+		document.getElementById("sdr").innerText = ss.standardDeviation(yValues).toFixed(4);
+		var points = [];
+		for(var point of schart.data.datasets[0].data) {
+            points.push([point.x, point.y]);
+        }
+		var line = ss.linearRegressionLine(ss.linearRegression(points));
+		document.getElementById("r2").innerText = ss.rSquared(points, line).toFixed(4);
+	}
     document.getElementById("noAssociation").addEventListener('click', (event) => {
         hychart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         schart.data.datasets[0].data = [];
@@ -194,6 +218,7 @@
         schart.update('none');
         hychart.update('none');
         updateResiduals();
+		updateInfo();
     });
     document.getElementById("weakAssociation").addEventListener('click', () => {
         hychart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -209,6 +234,7 @@
         schart.update('none');
         hychart.update('none');
         updateResiduals();
+		updateInfo();
     });
     document.getElementById("moderateAssociation").addEventListener('click', () => {
         hychart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -224,6 +250,7 @@
         schart.update('none');
         hychart.update('none');
         updateResiduals();
+		updateInfo();
     });
     document.getElementById("strongAssociation").addEventListener('click', () => {
         hychart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -239,6 +266,7 @@
         schart.update('none');
         hychart.update('none');
         updateResiduals();
+		updateInfo();
     });
 	document.getElementById("clearGraph").addEventListener('click', () => {
         hychart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -249,6 +277,9 @@
         hychart.update('none');
 		hrchart.update('none');
         rpchart.update('none');
+		document.getElementById("sdy").innerText = "";
+		document.getElementById("sdr").innerText = "";
+		document.getElementById("r2").innerText = "";
     });
 </script>
 </html>
