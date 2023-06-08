@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>rsqre: r^2 explained</title>
+    <script src="https://www.unpkg.com/chart.js@4.3.0/dist/chart.umd.js" type="text/javascript"></script>
+    <script src="https://unpkg.com/simple-statistics@7.8.3/dist/simple-statistics.min.js" type="text/javascript"></script>
+    <style>
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+        html {
+            border-top: seagreen solid 0.5em;
+        }
+        button {
+            font-family: inherit;
+            background-color: lightcyan;
+            padding: 0.3em;
+            border-radius: 0.5em;
+            cursor: pointer;
+            border: 0.15em black solid;
+        }
+        button:hover {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <center><h1>rsqre: r^2 explained</h1></center>
+    <center>
+        <h2>Scatterplot and histogram of y-values in scatterplot</h2>
+        <div>
+            <span><b>Create scatter plot:</b></span>
+            <button id="noAssociation">No Association</button>
+            <button id="weakAssociation">Weak Association</button>
+            <button id="moderateAssociation">Moderate Association</button>
+            <button id="strongAssociation">Strong Association</button>
+			<button id="clearGraph">Clear Graph</button>
+        </div>
+		<div>
+			<span style="color: blue;"><b>Standard deviation (SD) of y-values:</b> <span id="sdy"></span></span>,
+			<span style="color: green;"><b>SD of residuals</b> <span id="sdr"></span></span>,
+			<span style="color: red;"><b>r^2:</b> <span id="r2"></span></span>
+		</div>
+    </center>
+    <div style="display: grid; grid-template-columns: 1fr 1fr;">
+        <div>
+            <canvas id="scatterplot"></canvas>
+        </div>
+        <div>
+            <canvas id="histogramY"></canvas>
+        </div>
+    </div>
+    <center><h2>Residual plot and histogram of residuals</h2></center>
+    <div style="display: grid; grid-template-columns: 1fr 1fr;">
+        <div>
+            <canvas id="residualPlot"></canvas>
+        </div>
+        <div>
+            <canvas id="histogramRes"></canvas>
+        </div>
+    </div>
+</body>
+<script>
+    Chart.defaults.font.family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'"; 
+    const hyctx = document.getElementById('histogramY');
+    var hychart = new Chart(hyctx, {
+        type: 'bar',
+        data: {
+            labels: [0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5],
+            datasets: [{
+                label: 'y-values in scatterplot',
+                data: [0,0,0,0,0,0,0,0,0,0],
+                backgroundColor: '#2596be90',
+            	barPercentage: 1.0,
+                categoryPercentage: 1.0,
+                borderColor: "#002236",
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    type: 'linear',
+                    offset: false,
+                    ticks: {
+                    stepSize: 1
+                    },
+                    grid: {
+                        offset: false
+                    },
+                }
+            }
+        }
+    });
+    const hrctx = document.getElementById('histogramRes');
+    var hrchart = new Chart(hrctx, {
+    	type: 'bar',
+        data: {
+            labels: [-4.5,-3.5,-2.5,-1.5,-0.5,0.5,1.5,2.5,3.5,4.5],
+            datasets: [{
+                label: 'Residuals',
+                data: [0,0,0,0,0,0,0,0,0,0,0],
+                backgroundColor: '#4ec74590',
+                barPercentage: 1.0,
+                categoryPercentage: 1.0,
+                borderColor: "#003602",
+                borderWidth: 1,
+            }]
+        },
+        options: {
+      	    scales: {
+                x: {
+                    type: 'linear',
+                    offset: false,
+                    ticks: {
+                        stepSize: 1
+                    },
+                    grid: {
+                        offset: false
+                    },
+                }
+            }
+        }
+    });
+    const rpctx = document.getElementById('residualPlot');
+    const rpchart = new Chart(rpctx, {
+    	type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Residual of each point given x-value',
+                data: [],
+                backgroundColor: '#4ec74590',
+            }]
+        }
+    });
+    function updateResiduals() {
+        var dataNewFormat = [];
+        for(var point of schart.data.datasets[0].data) {
+			dataNewFormat.push([point.x, point.y]);
+        }
+        hrchart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        rpchart.data.datasets[0].data = [];
+        var line = ss.linearRegression(dataNewFormat);
+        for(var point of schart.data.datasets[0].data) {
+            var residual = point.y - (line.b + line.m * point.x);
+            hrchart.data.datasets[0].data[Math.floor(residual + 5)]++;
+            rpchart.data.datasets[0].data.push({x: point.x, y: residual});
+        }
+        hrchart.update('none');
+        rpchart.update('none');
+    }
+    const sctx = document.getElementById('scatterplot');
+    const schart = new Chart(sctx, {
+        type: 'scatter',
+        data: {
+        	datasets: [{
+        		label: 'Scatterplot (click to add points)',
+          	    data: [],
+                backgroundColor: '#2596be90',
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    min: 0,
+                    max: 10
+                },
+                y: {
+                	type: 'linear',
+                    position: 'left',
+                    min: 0,
+                    max: 10
+                }
+            },
+            onClick: (event) => {
+                const rawPosition = Chart.helpers.getRelativePosition(event, schart);
+             	const dataX = schart.scales["x"].getValueForPixel(rawPosition.x);
+      			const dataY = schart.scales.y.getValueForPixel(rawPosition.y);
+                hychart.data.datasets[0].data[Math.floor(dataY)]++;
+                hychart.update('none');
+                schart.data.datasets[0].data.push({x: dataX, y: dataY});
+                schart.update('none');
+                updateResiduals();
+				updateInfo();
+            }
+        }
+    });
+	function updateInfo() {
+		var yValues = [];
+		for(var point of schart.data.datasets[0].data) {
+			yValues.push(point.y);
+		}
+		document.getElementById("sdy").innerText = ss.standardDeviation(yValues).toFixed(4);
+		yValues = [];
+		for(var point of rpchart.data.datasets[0].data) {
+			yValues.push(point.y);
+		}
+		document.getElementById("sdr").innerText = ss.standardDeviation(yValues).toFixed(4);
+		var points = [];
+		for(var point of schart.data.datasets[0].data) {
+            points.push([point.x, point.y]);
+        }
+		var line = ss.linearRegressionLine(ss.linearRegression(points));
+		document.getElementById("r2").innerText = ss.rSquared(points, line).toFixed(4);
+	}
+    document.getElementById("noAssociation").addEventListener('click', (event) => {
+        hychart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        schart.data.datasets[0].data = [];
+        for(var ix = 0; ix < 200; ix++) {
+            var x = 10 * Math.random();
+            var y = 10 * Math.random();
+            schart.data.datasets[0].data.push({x: x, y: y});
+            hychart.data.datasets[0].data[Math.floor(y)]++;
+        }
+        schart.update('none');
+        hychart.update('none');
+        updateResiduals();
+		updateInfo();
+    });
+    document.getElementById("weakAssociation").addEventListener('click', () => {
+        hychart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        schart.data.datasets[0].data = [];
+        for(var ix = 0; ix < 10; ix++) {
+            for(var j = 0; j < 10; j++) {
+                var x = Math.min(ix + 2 * Math.random(), 10 - Math.random());
+                var y = Math.min(Math.max(2 * Math.random(), ix + 4.5 - 9 * Math.random()), 10 - 2 * Math.random());
+                schart.data.datasets[0].data.push({x: x, y: y});
+                hychart.data.datasets[0].data[Math.floor(y)]++;
+            }
+        }
+        schart.update('none');
+        hychart.update('none');
+        updateResiduals();
+		updateInfo();
+    });
+    document.getElementById("moderateAssociation").addEventListener('click', () => {
+        hychart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        schart.data.datasets[0].data = [];
+        for(var ix = 0; ix < 10; ix++) {
+            for(var j = 0; j < 10; j++) {
+                var x = ix + Math.random();
+                var y = Math.min(Math.max(Math.random(), ix + 3 - 6 * Math.random()), 10 - Math.random());
+                schart.data.datasets[0].data.push({x: x, y: y});
+                hychart.data.datasets[0].data[Math.floor(y)]++;
+            }
+        }
+        schart.update('none');
+        hychart.update('none');
+        updateResiduals();
+		updateInfo();
+    });
+    document.getElementById("strongAssociation").addEventListener('click', () => {
+        hychart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        schart.data.datasets[0].data = [];
+        for(var ix = 0; ix < 10; ix++) {
+            for(var j = 0; j < 10; j++) {
+                var x = ix + Math.random();
+                var y = Math.min(ix + 2.5 * Math.random(), 10 - 2.5 * Math.random());
+                schart.data.datasets[0].data.push({x: x, y: y});
+                hychart.data.datasets[0].data[Math.floor(y)]++;
+            }
+        }
+        schart.update('none');
+        hychart.update('none');
+        updateResiduals();
+		updateInfo();
+    });
+	document.getElementById("clearGraph").addEventListener('click', () => {
+        hychart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        schart.data.datasets[0].data = [];
+        hrchart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        rpchart.data.datasets[0].data = [];
+		schart.update('none');
+        hychart.update('none');
+		hrchart.update('none');
+        rpchart.update('none');
+		document.getElementById("sdy").innerText = "";
+		document.getElementById("sdr").innerText = "";
+		document.getElementById("r2").innerText = "";
+    });
+</script>
+</html>
