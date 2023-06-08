@@ -39,10 +39,12 @@
         <div>
 			<center><h3>Population Distribution (n=1000)</h3></center>
             <canvas id="histogramPopulation"></canvas>
+			<center><h3 style="color: blue;">Mean: <span id="popMean"></span>; Standard Deviation: <span id="popSD"></span></h3></center>
         </div>
         <div>
 			<center><h3>Distribution of sample means</h3></center>
             <canvas id="samplemeanHistogram"></canvas>
+			<center><h3 style="color: green;">Mean: <span id="smMean"></span>; Standard Deviation: <span id="smSD"></span></h3></center>
         </div>
     </div>
 </body>
@@ -86,10 +88,10 @@
             datasets: [{
                 label: 'Sample means',
                 data: [0,0,0,0,0,0,0,0,0,0],
-                backgroundColor: '#2596be90',
+                backgroundColor: '#4ec74590',
             	barPercentage: 1.0,
                 categoryPercentage: 1.0,
-                borderColor: "#002236",
+                borderColor: "#003602",
                 borderWidth: 1,
             }]
         },
@@ -116,6 +118,8 @@
 			population.push(val);
 			hpchart.data.datasets[0].data[Math.floor(population[i] / 40)]++;
 		}
+		document.getElementById("popMean").innerText = ss.mean(population).toFixed(4);
+		document.getElementById("popSD").innerText = ss.standardDeviation(population).toFixed(4);
 		hpchart.update();
 	};
 	document.getElementById("simulate").addEventListener("click", () => {
@@ -135,6 +139,8 @@
 			sampleMeans.push(ss.mean(sample));
 			smchart.data.datasets[0].data[Math.floor((ss.mean(sample) - 160) / 8)]++;
 		}
+		document.getElementById("smMean").innerText = ss.mean(sampleMeans).toFixed(4);
+		document.getElementById("smSD").innerText = ss.standardDeviation(sampleMeans).toFixed(4);
 		smchart.update();
 	});
 </script>
