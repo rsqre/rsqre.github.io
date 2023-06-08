@@ -2,7 +2,7 @@
 <html>
 <head>
 	<title>rsqre: 10% condition simulation on sample means</title>
-	<script src="chart.js" type="text/javascript"></script>
+	<script src="https://www.unpkg.com/chart.js@4.3.0/dist/chart.umd.js" type="text/javascript"></script>
 	<script src="https://unpkg.com/simple-statistics@7.8.3/dist/simple-statistics.min.js" type="text/javascript"></script>
 	<style>
         body {
@@ -54,7 +54,7 @@
     var hpchart = new Chart(hpctx, {
         type: 'bar',
         data: {
-            labels: [20,60,100,140,180,220,260,300,340,380],
+            labels: [400,1200,2000,2800,3600,4400,5200,6000,6800,7600],
             datasets: [{
                 label: 'Population',
                 data: [0,0,0,0,0,0,0,0,0,0],
@@ -71,7 +71,7 @@
                     type: 'linear',
                     offset: false,
                     ticks: {
-                    stepSize: 40
+                    stepSize: 800
                     },
                     grid: {
                         offset: false
@@ -84,7 +84,7 @@
 	var smchart = new Chart(smhctx, {
         type: 'bar',
         data: {
-            labels: [164, 172, 180, 188, 196, 204, 212, 220, 228, 236],
+            labels: [3280, 3440, 3600, 3760, 3920, 4080, 4240, 4400, 4560, 4720],
             datasets: [{
                 label: 'Sample means',
                 data: [0,0,0,0,0,0,0,0,0,0],
@@ -101,7 +101,7 @@
                     type: 'linear',
                     offset: false,
                     ticks: {
-                    stepSize: 8
+                    stepSize: 160
                     },
                     grid: {
                         offset: false
@@ -114,9 +114,9 @@
 	window.onload = () => {
 		hpchart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 		for(var i = 0; i < 1000; i++) {
-			var val = 400 * Math.random();
+			var val = 8000 * Math.random();
 			population.push(val);
-			hpchart.data.datasets[0].data[Math.floor(population[i] / 40)]++;
+			hpchart.data.datasets[0].data[Math.floor(population[i] / 800)]++;
 		}
 		document.getElementById("popMean").innerText = ss.mean(population).toFixed(4);
 		document.getElementById("popSD").innerText = ss.standardDeviation(population).toFixed(4);
@@ -137,7 +137,7 @@
 				sample.push(population[element]);
 			}
 			sampleMeans.push(ss.mean(sample));
-			smchart.data.datasets[0].data[Math.floor((ss.mean(sample) - 160) / 8)]++;
+			smchart.data.datasets[0].data[Math.floor((ss.mean(sample) - 3200) / 160)]++;
 		}
 		document.getElementById("smMean").innerText = ss.mean(sampleMeans).toFixed(4);
 		document.getElementById("smSD").innerText = ss.standardDeviation(sampleMeans).toFixed(4);
