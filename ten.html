@@ -29,15 +29,15 @@
 		<h1>rsqre: 10% condition simulation on sample means</h1>
 		<label for="num">Sample size to draw:</label>
 		<select name="num" id="num">
-			<option value="50">50 (10%)</option>
-			<option value="100">100 (20%)</option>
-			<option value="200">200 (40%)</option>
+			<option value="100">100 (10%)</option>
+			<option value="200">200 (20%)</option>
+			<option value="400">400 (40%)</option>
 		</select>
 		<button id="simulate">Simulate drawing sample means</button>
 	</center>
 	<div style="display: grid; grid-template-columns: 1fr 1fr;">
         <div>
-			<center><h3>Population Distribution (n=500)</h3></center>
+			<center><h3>Population Distribution (n=1000)</h3></center>
             <canvas id="histogramPopulation"></canvas>
         </div>
         <div>
@@ -52,7 +52,7 @@
     var hpchart = new Chart(hpctx, {
         type: 'bar',
         data: {
-            labels: [5,15,25,35,45,55,65,75,85,95],
+            labels: [20,60,100,140,180,220,260,300,340,380],
             datasets: [{
                 label: 'Population',
                 data: [0,0,0,0,0,0,0,0,0,0],
@@ -69,7 +69,7 @@
                     type: 'linear',
                     offset: false,
                     ticks: {
-                    stepSize: 10
+                    stepSize: 40
                     },
                     grid: {
                         offset: false
@@ -82,7 +82,7 @@
 	var smchart = new Chart(smhctx, {
         type: 'bar',
         data: {
-            labels: [5,15,25,35,45,55,65,75,85,95],
+            labels: [164, 172, 180, 188, 196, 204, 212, 220, 228, 236],
             datasets: [{
                 label: 'Sample means',
                 data: [0,0,0,0,0,0,0,0,0,0],
@@ -99,7 +99,7 @@
                     type: 'linear',
                     offset: false,
                     ticks: {
-                    stepSize: 10
+                    stepSize: 8
                     },
                     grid: {
                         offset: false
@@ -108,25 +108,34 @@
             }
         }
     });
-	document.getElementById("simulate").addEventListener("click", () => {
+	var population = [];
+	window.onload = () => {
 		hpchart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-		var sample = [], population = [], seen = [];
-		for(var i = 0; i < 500; i++) {
-			var val = 100 * Math.random();
+		for(var i = 0; i < 1000; i++) {
+			var val = 400 * Math.random();
 			population.push(val);
-			seen.push(false);
-			hpchart.data.datasets[0].data[Math.floor(population[i] / 10)]++;
+			hpchart.data.datasets[0].data[Math.floor(population[i] / 40)]++;
 		}
 		hpchart.update();
-		var sampleSize = document.getElementById("num").value;
-		for(var i = 0; i < sampleSize; i++) {
-			var element = Math.floor(500 * Math.random());
-			while(seen[element]) {
-				element = Math.floor(500 * Math.random());
+	};
+	document.getElementById("simulate").addEventListener("click", () => {
+		var sampleSize = document.getElementById("num").value, sampleMeans = [];
+		smchart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+		for(var cnt = 0; cnt < 1000; cnt++) {
+			var seen = new Map();
+			var sample = [];
+			for(var i = 0; i < sampleSize; i++) {
+				var element = Math.floor(1000 * Math.random());
+				while(seen.has(element)) {
+					element = Math.floor(1000 * Math.random());
+				}
+				seen.set(element, true);
+				sample.push(population[element]);
 			}
-			seen[element] = true;
-			sample.push(population[element]);
+			sampleMeans.push(ss.mean(sample));
+			smchart.data.datasets[0].data[Math.floor((ss.mean(sample) - 160) / 8)]++;
 		}
+		smchart.update();
 	});
 </script>
 </html>
