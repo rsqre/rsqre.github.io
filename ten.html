@@ -25,7 +25,16 @@
     </style>
 </head>
 <body>
-	<center><h1>rsqre: 10% condition simulation on sample means</h1></center>
+	<center>
+		<h1>rsqre: 10% condition simulation on sample means</h1>
+		<label for="num">Sample size to draw:</label>
+		<select name="num" id="num">
+			<option value="50">50 (10%)</option>
+			<option value="100">100 (20%)</option>
+			<option value="200">200 (40%)</option>
+		</select>
+		<button id="simulate">Simulate drawing sample means</button>
+	</center>
 	<div style="display: grid; grid-template-columns: 1fr 1fr;">
         <div>
 			<center><h3>Population Distribution (n=500)</h3></center>
@@ -45,7 +54,7 @@
         data: {
             labels: [5,15,25,35,45,55,65,75,85,95],
             datasets: [{
-                label: 'y-values in scatterplot',
+                label: 'Population',
                 data: [0,0,0,0,0,0,0,0,0,0],
                 backgroundColor: '#2596be90',
             	barPercentage: 1.0,
@@ -69,13 +78,55 @@
             }
         }
     });
-	window.addEventListener("load", () => {
+	const smhctx = document.getElementById('samplemeanHistogram');
+	var smchart = new Chart(smhctx, {
+        type: 'bar',
+        data: {
+            labels: [5,15,25,35,45,55,65,75,85,95],
+            datasets: [{
+                label: 'Sample means',
+                data: [0,0,0,0,0,0,0,0,0,0],
+                backgroundColor: '#2596be90',
+            	barPercentage: 1.0,
+                categoryPercentage: 1.0,
+                borderColor: "#002236",
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    type: 'linear',
+                    offset: false,
+                    ticks: {
+                    stepSize: 10
+                    },
+                    grid: {
+                        offset: false
+                    },
+                }
+            }
+        }
+    });
+	document.getElementById("simulate").addEventListener("click", () => {
+		hpchart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+		var sample = [], population = [], seen = [];
 		for(var i = 0; i < 500; i++) {
 			var val = 100 * Math.random();
-			console.log(Math.floor(val/10));
-			hpchart.data.datasets[0].data[Math.floor(val/10)]++;
+			population.push(val);
+			seen.push(false);
+			hpchart.data.datasets[0].data[Math.floor(population[i] / 10)]++;
 		}
-		hpchart.update('none');
+		hpchart.update();
+		var sampleSize = document.getElementById("num").value;
+		for(var i = 0; i < sampleSize; i++) {
+			var element = Math.floor(500 * Math.random());
+			while(seen[element]) {
+				element = Math.floor(500 * Math.random());
+			}
+			seen[element] = true;
+			sample.push(population[element]);
+		}
 	});
 </script>
 </html>
